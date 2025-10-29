@@ -1,4 +1,4 @@
-# RosterFilter
+# TeronRosterFilter
 
 A Turtle WoW guild frame addon based on aux's style.
 

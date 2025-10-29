@@ -1,3 +1,3 @@
 <Bindings>
-	<Binding name="Open RosterFilter UI" category="RosterFilter Bindings">RosterFilter_ToggleWindow()</Binding>
+	<Binding name="Open TeronRosterFilter UI" category="TeronRosterFilter Bindings">RosterFilter_ToggleWindow()</Binding>
 </Bindings>
