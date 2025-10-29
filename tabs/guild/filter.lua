@@ -71,7 +71,7 @@ M.filters = {
         input_type = '',
         validator = function()
             return function(member)
-                if GetNumGroupMembers() == 0 then return false; end;
+                if GetNumRaidMembers() == 0 then return false; end;
                 for i = 1, 40 do
                     local name,_,_,_,_,_,_,_,_,_,_ = GetRaidRosterInfo(i)
                     if name and strlower(name) == strlower(member.name) then return true; end;
@@ -84,7 +84,7 @@ M.filters = {
         input_type = '',
         validator = function()
             return function(member)
-                if GetNumGroupMembers() == 0 then return true; end;
+                if GetNumRaidMembers() == 0 then return true; end;
                 for i = 1, 40 do
                     local name,_,_,_,_,_,_,_,_,_,_ = GetRaidRosterInfo(i)
                     if name and strlower(name) == strlower(member.name) then return false; end;
@@ -233,10 +233,18 @@ function M.Query(str)
             zone_color = rosterfilter.color.text.enabled
         end
         -- local num_ranks = table.getn(rank_cache)
+        
+        -- Vanilla WoW compatible class color wrapping
+        local classColor = RAID_CLASS_COLORS[member.classFile]
+        local coloredName = member.name
+        if classColor then
+            coloredName = format('|cff%02x%02x%02x%s|r', classColor.r * 255, classColor.g * 255, classColor.b * 255, member.name)
+        end
+        
         tinsert(rows, {
             ['cols'] = {
                 {['name'] = 'class', ['value'] = '', ['sort'] = member.class},
-                {['name'] = 'name', ['value'] = RAID_CLASS_COLORS[member.classFile]:WrapTextInColorCode(member.name), ['sort'] = member.name},
+                {['name'] = 'name', ['value'] = coloredName, ['sort'] = member.name},
                 {['name'] = 'level', ['value'] = member.level, ['sort'] = tonumber(member.level)},
                 {['name'] = 'rank', ['value'] = member.rank, ['sort'] = member.rank_index},
                 -- {['name'] = '', ['value'] = format('%s (%d)', member.rank, num_ranks - member.rank_index + 1), ['sort'] = member.rank_index},
