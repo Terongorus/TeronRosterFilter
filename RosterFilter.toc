@@ -1,4 +1,4 @@
-## Interface: 11505
+## Interface: 11200
 ## Title: RosterFilter
 ## Author: Starhammer
 ## Notes: A guild frame replacement.

@@ -16,7 +16,7 @@ function SlashCmdList.ROSTERFILTER(command)
     	local scale = tonumber(arguments[2])
         rosterfilter.SetConfig('scale', scale)
     else
-        C_GuildInfo.GuildRoster();
+        GuildRoster();
         RosterFilterFrame:Show()
         rosterfilter.set_tab(1)
     end

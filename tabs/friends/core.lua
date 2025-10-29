@@ -16,7 +16,7 @@ end
 
 function tab.OPEN()
     friendlist_update_listener = rosterfilter.event_listener("FRIENDLIST_UPDATE", function() refresh = true; end)
-    local friends = C_FriendList.GetNumFriends();
+    local friends = GetNumFriends();
     if friends >= 50 then
         add_button:Disable()
     end
@@ -33,23 +33,29 @@ end
 function update_listing()
     rosterfilter.wipe(friends_cache)
 
-    local friends = C_FriendList.GetNumFriends();
+    local friends = GetNumFriends();
 
     local rows = {};
 
     for i = 1, friends do
-        local info = C_FriendList.GetFriendInfoByIndex(i);
+        -- In Vanilla WoW: name, level, class, area, connected, status, notes = GetFriendInfo(index)
+        local name, level, class, area, connected, status_flag, notes = GetFriendInfo(i);
+        
         local status = "";
-        if info.dnd then status = "<DND>" elseif info.afk then status = "<AFK>" end
+        if status_flag == "<DND>" then 
+            status = "<DND>" 
+        elseif status_flag == "<AFK>" then 
+            status = "<AFK>" 
+        end
 
         local friend = {
-            ['name'] = info.name,
-            ['level'] = info.level,
-            ['class'] = info.className,
-            ['zone'] = info.area,
-            ['online'] = info.connected,
+            ['name'] = name,
+            ['level'] = level,
+            ['class'] = class,
+            ['zone'] = area,
+            ['online'] = connected,
             ['status'] = status,
-            ['notes'] = info.notes
+            ['notes'] = notes or ""
         }
         tinsert(friends_cache, friend)
 
