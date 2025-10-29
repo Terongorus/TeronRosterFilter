@@ -8,7 +8,7 @@ function status(enabled)
 end
 
 
-_G.SLASH_ROSTERFILTER1 = '/rf'
+_G.SLASH_ROSTERFILTER1 = '/roster'
 function SlashCmdList.ROSTERFILTER(command)
 	if not command then return end
 	local arguments = rosterfilter.tokenize(command)
