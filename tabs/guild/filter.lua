@@ -235,10 +235,14 @@ function M.Query(str)
         -- local num_ranks = table.getn(rank_cache)
         
         -- Vanilla WoW compatible class color wrapping
+        -- In Vanilla, RAID_CLASS_COLORS uses 0-1 range for r,g,b values
         local classColor = RAID_CLASS_COLORS[member.classFile]
         local coloredName = member.name
         if classColor then
-            coloredName = format('|cff%02x%02x%02x%s|r', classColor.r * 255, classColor.g * 255, classColor.b * 255, member.name)
+            local r = math.min(255, math.max(0, math.floor(classColor.r * 255)))
+            local g = math.min(255, math.max(0, math.floor(classColor.g * 255)))
+            local b = math.min(255, math.max(0, math.floor(classColor.b * 255)))
+            coloredName = format('|cff%02x%02x%02x%s|r', r, g, b, member.name)
         end
         
         tinsert(rows, {
