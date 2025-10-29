@@ -1,6 +1,6 @@
 ## Interface: 11200
-## Title: RosterFilter
-## Author: Starhammer
+## Title: TeronRosterFilter
+## Author: Teron
 ## Notes: A guild frame replacement.
 ## Version: 2.4
 ## SavedVariables: RosterFilterOptions
