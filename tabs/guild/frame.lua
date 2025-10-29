@@ -127,7 +127,7 @@ player_listing:SetHandler('OnClick', function(table, row_data, column, button)
         rosterfilter.print('  Note:', member.note)
     end
 
-    if C_GuildInfo.CanViewOfficerNote() and member.officer_note ~= '' then
+    if CanViewOfficerNote() and member.officer_note ~= '' then
         rosterfilter.print('  ONote:', member.officer_note)
     end
 
@@ -143,7 +143,7 @@ player_listing:SetHandler('OnClick', function(table, row_data, column, button)
 
     local edit_onote = nil
     local edit_onote_func = nil;
-    if C_GuildInfo.CanEditOfficerNote() then
+    if CanEditOfficerNote() then
         edit_onote = 'Edit Officer Note';
         edit_onote_func = function()
             SetGuildRosterSelection(member.index)
@@ -197,7 +197,7 @@ player_listing:SetHandler('OnClick', function(table, row_data, column, button)
                 DEFAULT_CHAT_FRAME.editBox:Show()
                 DEFAULT_CHAT_FRAME.editBox:SetText('/w '..member.fullName .. ' ');
             end,
-            'Invite', function () C_PartyInfo.InviteUnit(member.fullName) end,
+            'Invite', function () InviteUnit(member.fullName) end,
             edit_note, edit_note_func,
             edit_onote, edit_onote_func,
             'Copy Name', function ()
