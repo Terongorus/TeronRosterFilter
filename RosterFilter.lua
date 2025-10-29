@@ -9,7 +9,7 @@ _G.RosterFilter_ToggleWindow = function()
 	if visible then
 		RosterFilterFrame:Hide()
 	else
-		C_GuildInfo.GuildRoster();
+		GuildRoster();
 		RosterFilterFrame:Show()
 		set_tab(1)
 	end

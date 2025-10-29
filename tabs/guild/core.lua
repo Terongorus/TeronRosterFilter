@@ -10,12 +10,9 @@ map_cache = {}
 
 
 function rosterfilter.handle.LOAD()
-    for i = 1, 3000 do
-        local info = C_Map.GetMapInfo(i)
-        if info and info.mapID then
-            map_cache[info.name] = info.mapID
-        end
-    end
+    -- In Vanilla WoW (1.12), C_Map API is not available
+    -- Map cache will remain empty, zone categorization will use zone names
+    map_cache = {}
 
     rosterfilter.RegisterKeyChangedCallback("notes", function(value)
         if value then

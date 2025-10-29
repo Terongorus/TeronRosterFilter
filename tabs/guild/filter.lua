@@ -71,7 +71,7 @@ M.filters = {
         input_type = '',
         validator = function()
             return function(member)
-                if GetNumGroupMembers() == 0 then return false; end;
+                if GetNumRaidMembers() == 0 then return false; end;
                 for i = 1, 40 do
                     local name,_,_,_,_,_,_,_,_,_,_ = GetRaidRosterInfo(i)
                     if name and strlower(name) == strlower(member.name) then return true; end;
@@ -84,7 +84,7 @@ M.filters = {
         input_type = '',
         validator = function()
             return function(member)
-                if GetNumGroupMembers() == 0 then return true; end;
+                if GetNumRaidMembers() == 0 then return true; end;
                 for i = 1, 40 do
                     local name,_,_,_,_,_,_,_,_,_,_ = GetRaidRosterInfo(i)
                     if name and strlower(name) == strlower(member.name) then return false; end;
@@ -221,22 +221,34 @@ function M.Query(str)
         end
 
         local zone_color;
-        if zones.IsBattleground(member.mapID) then
+        if zones.IsBattleground(member.mapID) or (member.mapID == 0 and zones.IsBattlegroundByName(member.zone)) then
             zone_color = rosterfilter.color.red
-        elseif member.zone == "Naxxramas" or zones.IsRaid(member.mapID) then
+        elseif member.zone == "Naxxramas" or zones.IsRaid(member.mapID) or (member.mapID == 0 and zones.IsRaidByName(member.zone)) then
             zone_color = rosterfilter.color.blue
-        elseif member.zone == "Magisters' Terrace" or zones.IsDungeon(member.mapID) then
+        elseif member.zone == "Magisters' Terrace" or zones.IsDungeon(member.mapID) or (member.mapID == 0 and zones.IsDungeonByName(member.zone)) then
             zone_color = rosterfilter.color.lightblue
-        elseif zones.IsCity(member.mapID) then
+        elseif zones.IsCity(member.mapID) or (member.mapID == 0 and zones.IsCityByName(member.zone)) then
             zone_color = rosterfilter.color.green
         else
             zone_color = rosterfilter.color.text.enabled
         end
         -- local num_ranks = table.getn(rank_cache)
+        
+        -- Vanilla WoW compatible class color wrapping
+        -- In Vanilla, RAID_CLASS_COLORS uses 0-1 range for r,g,b values
+        local classColor = RAID_CLASS_COLORS[member.classFile]
+        local coloredName = member.name
+        if classColor then
+            local r = math.min(255, math.max(0, math.floor(classColor.r * 255)))
+            local g = math.min(255, math.max(0, math.floor(classColor.g * 255)))
+            local b = math.min(255, math.max(0, math.floor(classColor.b * 255)))
+            coloredName = format('|cff%02x%02x%02x%s|r', r, g, b, member.name)
+        end
+        
         tinsert(rows, {
             ['cols'] = {
                 {['name'] = 'class', ['value'] = '', ['sort'] = member.class},
-                {['name'] = 'name', ['value'] = RAID_CLASS_COLORS[member.classFile]:WrapTextInColorCode(member.name), ['sort'] = member.name},
+                {['name'] = 'name', ['value'] = coloredName, ['sort'] = member.name},
                 {['name'] = 'level', ['value'] = member.level, ['sort'] = tonumber(member.level)},
                 {['name'] = 'rank', ['value'] = member.rank, ['sort'] = member.rank_index},
                 -- {['name'] = '', ['value'] = format('%s (%d)', member.rank, num_ranks - member.rank_index + 1), ['sort'] = member.rank_index},
@@ -266,8 +278,13 @@ function M.UpdateRoster()
         local name, rank, rank_index, level, class, zone, note, officer_note, online, status, classFileName = GetGuildRosterInfo(i);
 
         if name then
+            -- In Vanilla WoW, Ambiguate doesn't exist but names don't have server suffixes
+            local shortName = name
+            if string.find(name, "-") then
+                shortName = string.gsub(name, "%-.*", "")
+            end
             local member = {
-                ['name'] = Ambiguate(name, "short"),
+                ['name'] = shortName,
                 ['fullName'] = name,
                 ['rank'] = rank,
                 ['rank_index'] = rank_index,
