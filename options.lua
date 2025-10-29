@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter'
+select(2, ...)('rosterfilter')
 
 function handle.LOAD()
     if not _G.RosterFilterOptions then

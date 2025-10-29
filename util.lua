@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter'
+select(2, ...)('rosterfilter')
 
 M.immutable = setmetatable({}, {
 	__metatable = false,

@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter'
+select(2, ...)('rosterfilter')
 
 
 _G.BINDING_HEADER_RF_HEADER = "RosterFilter";

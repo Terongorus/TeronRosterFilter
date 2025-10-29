@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter.tabs.friends'
+select(2, ...)('rosterfilter.tabs.friends')
 
 local rosterfilter = require 'rosterfilter'
 local gui = require 'rosterfilter.gui'
