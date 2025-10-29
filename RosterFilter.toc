@@ -7,7 +7,7 @@
 
 libs\package.lua
 
-RosterFilter.lua
+TeronRosterFilter.lua
 
 options.lua
 util.lua
