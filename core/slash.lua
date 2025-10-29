@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter.core.slash'
+select(2, ...)('rosterfilter.core.slash')
 
 local rosterfilter = require 'rosterfilter'
 

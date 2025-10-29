@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter'
+select(2, ...)('rosterfilter')
 
 local event_frame = CreateFrame'Frame'
 
