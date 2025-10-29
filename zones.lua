@@ -221,3 +221,66 @@ end
 function M.IsDungeon(mapID)
 	return dungeons[mapID]
 end
+
+-- Vanilla WoW zone name mappings (for when mapID is not available)
+local city_names = {
+	["Ironforge"] = true,
+	["Stormwind City"] = true,
+	["Darnassus"] = true,
+	["Orgrimmar"] = true,
+	["Thunder Bluff"] = true,
+	["Undercity"] = true,
+}
+
+local battleground_names = {
+	["Warsong Gulch"] = true,
+	["Arathi Basin"] = true,
+	["Alterac Valley"] = true,
+}
+
+local dungeon_names = {
+	["Ragefire Chasm"] = true,
+	["Deadmines"] = true,
+	["Wailing Caverns"] = true,
+	["Shadowfang Keep"] = true,
+	["Blackfathom Deeps"] = true,
+	["The Stockade"] = true,
+	["Gnomeregan"] = true,
+	["Razorfen Kraul"] = true,
+	["Scarlet Monastery"] = true,
+	["Razorfen Downs"] = true,
+	["Uldaman"] = true,
+	["Zul'Farrak"] = true,
+	["Maraudon"] = true,
+	["Sunken Temple"] = true,
+	["Blackrock Depths"] = true,
+	["Blackrock Spire"] = true,
+	["Dire Maul"] = true,
+	["Scholomance"] = true,
+	["Stratholme"] = true,
+}
+
+local raid_names = {
+	["Onyxia's Lair"] = true,
+	["Molten Core"] = true,
+	["Blackwing Lair"] = true,
+	["Ruins of Ahn'Qiraj"] = true,
+	["Temple of Ahn'Qiraj"] = true,
+	["Naxxramas"] = true,
+}
+
+function M.IsCityByName(zoneName)
+	return city_names[zoneName] or false
+end
+
+function M.IsRaidByName(zoneName)
+	return raid_names[zoneName] or false
+end
+
+function M.IsBattlegroundByName(zoneName)
+	return battleground_names[zoneName] or false
+end
+
+function M.IsDungeonByName(zoneName)
+	return dungeon_names[zoneName] or false
+end

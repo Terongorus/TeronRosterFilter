@@ -221,13 +221,13 @@ function M.Query(str)
         end
 
         local zone_color;
-        if zones.IsBattleground(member.mapID) then
+        if zones.IsBattleground(member.mapID) or (member.mapID == 0 and zones.IsBattlegroundByName(member.zone)) then
             zone_color = rosterfilter.color.red
-        elseif member.zone == "Naxxramas" or zones.IsRaid(member.mapID) then
+        elseif member.zone == "Naxxramas" or zones.IsRaid(member.mapID) or (member.mapID == 0 and zones.IsRaidByName(member.zone)) then
             zone_color = rosterfilter.color.blue
-        elseif member.zone == "Magisters' Terrace" or zones.IsDungeon(member.mapID) then
+        elseif member.zone == "Magisters' Terrace" or zones.IsDungeon(member.mapID) or (member.mapID == 0 and zones.IsDungeonByName(member.zone)) then
             zone_color = rosterfilter.color.lightblue
-        elseif zones.IsCity(member.mapID) then
+        elseif zones.IsCity(member.mapID) or (member.mapID == 0 and zones.IsCityByName(member.zone)) then
             zone_color = rosterfilter.color.green
         else
             zone_color = rosterfilter.color.text.enabled
@@ -266,8 +266,13 @@ function M.UpdateRoster()
         local name, rank, rank_index, level, class, zone, note, officer_note, online, status, classFileName = GetGuildRosterInfo(i);
 
         if name then
+            -- In Vanilla WoW, Ambiguate doesn't exist but names don't have server suffixes
+            local shortName = name
+            if string.find(name, "-") then
+                shortName = string.gsub(name, "%-.*", "")
+            end
             local member = {
-                ['name'] = Ambiguate(name, "short"),
+                ['name'] = shortName,
                 ['fullName'] = name,
                 ['rank'] = rank,
                 ['rank_index'] = rank_index,
