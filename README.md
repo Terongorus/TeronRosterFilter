@@ -5,9 +5,9 @@ replacement for the default Guild and Friends windows, with text-based search/fi
 syntax, sortable columns, and quick right-click actions (whisper, invite, edit notes,
 remove friend), instead of Blizzard's plain member list.
 
-This is Kaloyan "Terongorus" Kolev's personal fork of **RosterFilter**, a Retail addon
-originally by **Starhammer**, back-ported to run natively on pure Vanilla 1.12.1 clients
-(e.g. TwinStar Kronos V) as well as Turtle WoW.
+This is Terongorus's personal fork of **RosterFilter**, a Retail addon originally by
+**Starhammer**, back-ported to run natively on pure Vanilla 1.12.1 clients (e.g.
+TwinStar Kronos V) as well as Turtle WoW.
 
 ---
 
