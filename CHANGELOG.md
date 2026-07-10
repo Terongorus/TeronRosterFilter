@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions follow major.minor.hotfix (e.g. 1.2.3).
 
+## [3.0.1] - 2026-07-11
+
+### Fixed
+- The guild tab's filter parser fell back to an empty *string* instead of an empty *table* when
+  the search box was blank, crashing as soon as anything indexed it (`parse_filter_string`).
+- The guild roster query could hand a stale/missing index to a filter validator (most visibly
+  the `online` filter, `member.online` on a nil `member`) or to row-building, crashing the guild
+  tab's live update. Both spots now skip a missing entry defensively instead of erroring.
+
 ## [3.0.0] - 2026-07-10
 
 A foundational rewrite: the addon previously failed to load at all on a real Vanilla

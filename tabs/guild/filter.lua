@@ -156,7 +156,11 @@ M.filters = {
 function M.parse_filter_string(str)
     local used_filters = {}
 
-    local parts = str and rosterfilter.map(rosterfilter.split(str, '/'), function(part) return strlower(rosterfilter.trim(part)) end) or ''
+    -- `parts` is indexed as a list below (parts[i]) - the empty-input fallback must be an empty
+    -- table, not an empty string. The 'lvl' filter's validator further down has the same
+    -- str-and-X-or-Y pattern and correctly falls back to {}; this one fell back to '' instead,
+    -- which crashes as soon as anything tries to index it.
+    local parts = str and rosterfilter.map(rosterfilter.split(str, '/'), function(part) return strlower(rosterfilter.trim(part)) end) or {}
 
     local i = 1;
     while parts[i] do
@@ -195,7 +199,10 @@ function M.Query(str)
 
             for _,index in pairs(working_set) do
                 local member = member_cache[index]
-                if validator(member) then
+                -- member_cache[index] has been observed nil here in live testing even though
+                -- working_set is built from member_cache's own current size - skip defensively
+                -- rather than crash every validator (e.g. 'online' just does member.online).
+                if member and validator(member) then
                     tinsert(subset, index)
                 end
             end
@@ -206,6 +213,10 @@ function M.Query(str)
     local rows = {}
     for _,index in pairs(working_set) do
         local member = member_cache[index]
+
+        -- Same defensive nil-guard as the filter loop above - skip a stale index rather than
+        -- crash on the first member.X access below.
+        if member then
 
         local info_text;
         local alpha = 1.0;
@@ -260,6 +271,7 @@ function M.Query(str)
             ['record'] = member,
             ['alpha'] = alpha
         })
+        end
     end
 
     return rows or nil
