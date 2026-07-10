@@ -1,7 +1,7 @@
-select(2, ...) 'rosterfilter'
+RosterFilterAddonTable 'rosterfilter'
 
 
-_G.BINDING_HEADER_RF_HEADER = "RosterFilter";
+_G.BINDING_HEADER_RF_HEADER = "Teron's Roster Filter";
 _G.BINDING_NAME_TOGGLE_RF = "Toggle Window";
 
 _G.RosterFilter_ToggleWindow = function()
@@ -17,7 +17,7 @@ end
 
 
 function M.print(...)
-    DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '<rosterfilter> ' .. join(map({...}, tostring), ' '))
+    DEFAULT_CHAT_FRAME:AddMessage(LIGHTYELLOW_FONT_COLOR_CODE .. '<rosterfilter> ' .. join(map({unpack(arg, 1, arg.n)}, tostring), ' '))
 end
 
 
@@ -37,16 +37,18 @@ do
 	function set_handler.LOAD2(f)
 		tinsert(handlers2, f)
 	end
-	event_frame:SetScript('OnEvent', function(_, event, arg1, ...)
+	-- Vanilla's OnEvent is pre-vararg: event/arg1 are globals during the callback,
+	-- not function parameters.
+	event_frame:SetScript('OnEvent', function()
 		if event == 'ADDON_LOADED' then
-			if arg1 == 'RosterFilter' then
-				for _, f in ipairs(handlers) do f(arg1, ...) end
+			if arg1 == 'TeronRosterFilter' then
+				for _, f in ipairs(handlers) do f(arg1) end
 			end
 		elseif event == 'PLAYER_LOGIN' then
-			for _, f in ipairs(handlers2) do f(arg1, ...) end
-			print('loaded - /rf')
+			for _, f in ipairs(handlers2) do f(arg1) end
+			print('loaded - /trf')
 		else
-			_M[event](arg1, ...)
+			_M[event](arg1)
 		end
 	end)
 end
@@ -87,10 +89,10 @@ end
 M.orig = setmetatable({[_G]={}}, {__index=function(self, key) return self[_G][key] end})
 function M.hook(...)
 	local name, object, handler
-	if select('#', ...) == 3 then
-		name, object, handler = ...
+	if arg.n == 3 then
+		name, object, handler = arg[1], arg[2], arg[3]
 	else
-		object, name, handler = _G, ...
+		object, name, handler = _G, arg[1], arg[2]
 	end
 	handler = handler or getfenv(3)[name]
 	orig[object] = orig[object] or {}

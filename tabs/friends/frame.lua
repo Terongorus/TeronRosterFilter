@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter.tabs.friends'
+RosterFilterAddonTable 'rosterfilter.tabs.friends'
 
 local rosterfilter = require 'rosterfilter'
 local gui = require 'rosterfilter.gui'
@@ -32,7 +32,7 @@ frame.content:SetPoint('TOP', frame.header, 'BOTTOM', 0, -padding)
 frame.content:SetPoint('BOTTOMLEFT', frame.footer, 'TOPLEFT', 0, padding)
 frame.content:SetPoint('BOTTOMRIGHT', frame.footer, 'TOPRIGHT', 0, padding)
 
-frame.content:SetScript('OnSizeChanged', function(width, height)
+frame.content:SetScript('OnSizeChanged', function()
     refresh = true
 end)
 
@@ -61,7 +61,14 @@ end)
 
 player_listing:SetHandler('OnClick', function(table, row_data, column, button)
     local friend = row_data.record
-    print(friend.name, 'Level', friend.level, friend.class, '-', friend.zone)
+
+    do
+        local lines = { 'Level ' .. friend.level .. ' ' .. friend.class, friend.zone }
+        if friend.notes and friend.notes ~= '' then
+            tinsert(lines, 'Note: ' .. friend.notes)
+        end
+        rosterfilter.show_details(friend.name, lines)
+    end
 
     if button == 'RightButton' then
         gui.menu(
@@ -72,7 +79,7 @@ player_listing:SetHandler('OnClick', function(table, row_data, column, button)
                 DEFAULT_CHAT_FRAME.editBox:Show()
                 DEFAULT_CHAT_FRAME.editBox:SetText('/w '..friend.name .. " ");
             end,
-            'Invite', function () InviteUnit(friend.name) end,
+            'Invite', function () InviteByName(friend.name) end,
             'Remove Friend', function () RemoveFriend(friend.name) end,
             'Cancel', function () return; end
         )

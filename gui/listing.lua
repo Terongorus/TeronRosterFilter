@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter.gui.listing'
+RosterFilterAddonTable 'rosterfilter.gui.listing'
 
 local rosterfilter = require 'rosterfilter'
 local gui = require 'rosterfilter.gui'
@@ -10,17 +10,20 @@ local HEAD_SPACE = 2
 local DEFAULT_COL_INFO = {{width=1}}
 
 
+-- Vanilla's widget scripts (pre-Cataclysm) are pre-vararg like OnEvent: the frame is
+-- the global `this`, not a `self` parameter, and OnClick/OnDoubleClick's mouse button
+-- comes via the global `arg1`, not a `button` parameter.
 local handlers = {
-    OnEnter = function(self)
-        self.mouseover = true
-        if not self.data then return end
-        if not self.st.highlightDisabled then
-            self.highlight:Show()
+    OnEnter = function()
+        this.mouseover = true
+        if not this.data then return end
+        if not this.st.highlightDisabled then
+            this.highlight:Show()
         end
 
-        local handler = self.st.handlers.OnEnter
+        local handler = this.st.handlers.OnEnter
         if handler then
-            handler(self.st, self.data, self)
+            handler(this.st, this.data, this)
         end
 
         local x,y = RosterFilterFrame:GetCenter();
@@ -31,9 +34,9 @@ local handlers = {
             anchor = 'ANCHOR_LEFT'
         end
 
-        GameTooltip:SetOwner(self, anchor)
-        for _,col in pairs(self.st.tooltipCols) do
-            local data = self.data.cols[col]
+        GameTooltip:SetOwner(this, anchor)
+        for _,col in pairs(this.st.tooltipCols) do
+            local data = this.data.cols[col]
             if data.value and data.value ~= '' then
                 GameTooltip:AddLine(data.name .. ": " .. data.value)
             end
@@ -41,35 +44,35 @@ local handlers = {
         GameTooltip:Show()
     end,
 
-    OnLeave = function(self)
-        self.mouseover = false
-        if not self.data then return end
-        if not (self.st.selected and self.st.selected(self.data)) then
-            self.highlight:Hide()
+    OnLeave = function()
+        this.mouseover = false
+        if not this.data then return end
+        if not (this.st.selected and this.st.selected(this.data)) then
+            this.highlight:Hide()
         end
 
-        local handler = self.st.handlers.OnLeave
+        local handler = this.st.handlers.OnLeave
         if handler then
-            handler(self.st, self.data, self)
+            handler(this.st, this.data, this)
         end
 
         GameTooltip:Hide()
     end,
 
-    OnClick = function(self, button)
-        if not self.data then return end
-        local handler = self.st.handlers.OnClick
+    OnClick = function()
+        if not this.data then return end
+        local handler = this.st.handlers.OnClick
         if handler then
-            handler(self.st, self.data, self, button)
+            handler(this.st, this.data, this, arg1)
         end
     end,
 
-	OnDoubleClick = function(self, button)
-		if not self.data then return end
+	OnDoubleClick = function()
+		if not this.data then return end
 
-		local handler = self.st.handlers.OnDoubleClick
+		local handler = this.st.handlers.OnDoubleClick
 		if handler then
-			handler(self.st, self.data, self, button)
+			handler(this.st, this.data, this, arg1)
 		end
     end
 
@@ -78,17 +81,20 @@ local handlers = {
 
 local methods = {
 
-    OnHeadColumnClick = function(self, button)
-        local st = self.st
+    -- Wired directly via col:SetScript('OnClick', ...) below, so this one is a real
+    -- vanilla script handler (this-global), unlike the other entries in this table
+    -- which are called normally via colon-syntax (self is correct there).
+    OnHeadColumnClick = function()
+        local st = this.st
 
-        if st.sortColumn == self.colNum then
+        if st.sortColumn == this.colNum then
             st.sortInvert = not st.sortInvert
         else
             st.sortInvert = false
         end
 
-        st.sortColumn = self.colNum
-        st:SetSort(self.colNum)
+        st.sortColumn = this.colNum
+        st:SetSort(this.colNum)
         st:Update()
     end,
 
@@ -131,13 +137,13 @@ local methods = {
     end,
 
     Update = function(self)
-	    if #self.colInfo > 1 or self.colInfo[1].name then
+	    if getn(self.colInfo) > 1 or self.colInfo[1].name then
 		    self.headHeight = HEAD_HEIGHT
 	    else
 		    self.headHeight = 0
 	    end
 
-	    if #(self.rowData or empty) > self:GetNumRows() then
+	    if getn(self.rowData or empty) > self:GetNumRows() then
 		    self.contentFrame:SetPoint('BOTTOMRIGHT', -15, 0)
 	    else
 		    self.contentFrame:SetPoint('BOTTOMRIGHT', 0, 0)
@@ -146,7 +152,7 @@ local methods = {
         local width = self.contentFrame:GetRight() - self.contentFrame:GetLeft()
         local dynamic_width = self:GetWidthFromColInfo(self.colInfo)
 
-	    while #self.headCols < #self.colInfo do
+	    while getn(self.headCols) < getn(self.colInfo) do
 		    self:AddColumn()
 	    end
 
@@ -175,9 +181,9 @@ local methods = {
 
         if self.isSorted and self.sortColumn < getn(self.headCols) then
             if self.sortInvert then
-                self.headCols[self.sortColumn]:GetNormalTexture():SetColorTexture(.8, .6, 1, .8)
+                self.headCols[self.sortColumn]:GetNormalTexture():SetTexture(.8, .6, 1, .8)
             else
-                self.headCols[self.sortColumn]:GetNormalTexture():SetColorTexture(.6, .8, 1, .8)
+                self.headCols[self.sortColumn]:GetNormalTexture():SetTexture(.6, .8, 1, .8)
             end
         end
 
@@ -330,7 +336,7 @@ local methods = {
         end
         local highlight = row:CreateTexture()
         highlight:SetAllPoints()
-        highlight:SetColorTexture(1, .9, 0, .4)
+        highlight:SetTexture(1, .9, 0, .4)
         highlight:Hide()
         row.highlight = highlight
         row.st = self
@@ -372,8 +378,10 @@ function M.new(parent)
     st.contentFrame = contentFrame
 
     local scrollFrame = CreateFrame('ScrollFrame', st:GetName() .. 'ScrollFrame', st, 'FauxScrollFrameTemplate')
-    scrollFrame:SetScript('OnVerticalScroll', function(self, offset)
-        FauxScrollFrame_OnVerticalScroll(self, offset, ROW_HEIGHT, function() st:Update() end)
+    -- Vanilla's FauxScrollFrame_OnVerticalScroll reads the frame/offset itself via
+    -- this/arg1 internally; it doesn't take them as call arguments (2-arg signature).
+    scrollFrame:SetScript('OnVerticalScroll', function()
+        FauxScrollFrame_OnVerticalScroll(ROW_HEIGHT, function() st:Update() end)
     end)
     scrollFrame:SetAllPoints(contentFrame)
     st.scrollFrame = scrollFrame
@@ -385,7 +393,7 @@ function M.new(parent)
     scroll_bar:SetWidth(10)
     local thumbTex = scroll_bar:GetThumbTexture()
     thumbTex:SetPoint('CENTER', 0, 0)
-    thumbTex:SetColorTexture(rosterfilter.color.content.background())
+    thumbTex:SetTexture(rosterfilter.color.content.background())
     thumbTex:SetHeight(150)
     thumbTex:SetWidth(scroll_bar:GetWidth())
     _G[scroll_bar:GetName() .. 'ScrollUpButton']:Hide()

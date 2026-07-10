@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter.tabs.guild'
+RosterFilterAddonTable 'rosterfilter.tabs.guild'
 
 local rosterfilter = require 'rosterfilter'
 local gui = require 'rosterfilter.gui'
@@ -31,7 +31,7 @@ frame.content:SetPoint('TOP', frame.header, 'BOTTOM', 0, -padding)
 frame.content:SetPoint('BOTTOMLEFT', frame.footer, 'TOPLEFT', 0, padding)
 frame.content:SetPoint('BOTTOMRIGHT', frame.footer, 'TOPRIGHT', 0, padding)
 
-frame.content:SetScript('OnSizeChanged', function(width, height)
+frame.content:SetScript('OnSizeChanged', function()
     refresh = true
 end)
 
@@ -116,19 +116,21 @@ end)
 
 player_listing:SetHandler('OnClick', function(table, row_data, column, button)
     local member = row_data.record
-    rosterfilter.print(member.name, '-', 'Level', member.level, member.class, '-', member.zone)
 
     if IsShiftKeyDown() and ChatFrame1EditBox:IsVisible() then
         local text = ChatFrame1EditBox:GetText()
         ChatFrame1EditBox:SetText(text..member.name)
     end
 
-    if member.note ~= '' then
-        rosterfilter.print('  Note:', member.note)
-    end
-
-    if CanViewOfficerNote() and member.officer_note ~= '' then
-        rosterfilter.print('  ONote:', member.officer_note)
+    do
+        local lines = { 'Level ' .. member.level .. ' ' .. member.class, member.zone }
+        if member.note ~= '' then
+            tinsert(lines, 'Note: ' .. member.note)
+        end
+        if CanViewOfficerNote() and member.officer_note ~= '' then
+            tinsert(lines, 'Officer Note: ' .. member.officer_note)
+        end
+        rosterfilter.show_details(member.name, lines)
     end
 
     local edit_note = nil
@@ -197,7 +199,7 @@ player_listing:SetHandler('OnClick', function(table, row_data, column, button)
                 DEFAULT_CHAT_FRAME.editBox:Show()
                 DEFAULT_CHAT_FRAME.editBox:SetText('/w '..member.fullName .. ' ');
             end,
-            'Invite', function () InviteUnit(member.fullName) end,
+            'Invite', function () InviteByName(member.fullName) end,
             edit_note, edit_note_func,
             edit_onote, edit_onote_func,
             'Copy Name', function ()

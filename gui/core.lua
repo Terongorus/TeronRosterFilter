@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter.gui'
+RosterFilterAddonTable 'rosterfilter.gui'
 
 
 local rosterfilter = require 'rosterfilter'
@@ -22,7 +22,8 @@ end
 do
 	local menu = CreateFrame('Frame', unique_name(), UIParent, 'UIDropDownMenuTemplate')
 	M.menu = function(...)
-		local arg = {...}
+		-- Lua 5.0 auto-creates `arg` for this vararg function already; the rest of
+		-- this function already uses arg[i]/getn(arg), so nothing else needs to change.
 		HideDropDownMenu(1)
 		UIDropDownMenu_Initialize(menu, function()
 			for i = 1, getn(arg), 2 do
@@ -141,7 +142,7 @@ function M.button(parent, text_height)
     set_content_style(button)
     local highlight = button:CreateTexture(nil, 'HIGHLIGHT')
     highlight:SetAllPoints()
-    highlight:SetColorTexture(1, 1, 1, .2)
+    highlight:SetTexture(1, 1, 1, .2)
     button.highlight = highlight
     do
         local label = button:CreateFontString()
@@ -187,11 +188,11 @@ do
 			dock:SetPoint('TOPLEFT', 1, 1)
 			dock:SetPoint('TOPRIGHT', -1, 1)
 		end
-		dock:SetColorTexture(rosterfilter.color.panel.background())
+		dock:SetTexture(rosterfilter.color.panel.background())
 		tab.dock = dock
 		local highlight = tab:CreateTexture(nil, 'HIGHLIGHT')
 		highlight:SetAllPoints()
-		highlight:SetColorTexture(1, 1, 1, .2)
+		highlight:SetTexture(1, 1, 1, .2)
 		tab.highlight = highlight
 
 		tab.text = tab:CreateFontString()
@@ -203,10 +204,10 @@ do
 
 		tab:SetText(text)
 
-		tab:SetScript('OnClick', function(self)
-			if self.id ~= self.group.selected then
+		tab:SetScript('OnClick', function()
+			if this.id ~= this.group._selected then
 				PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB)
-				self.group:select(self.id)
+				this.group:select(this.id)
 			end
 		end)
 
@@ -268,43 +269,45 @@ function M.editbox(parent)
     editbox:SetHeight(24)
     editbox:SetTextColor(0, 0, 0, 0)
     set_content_style(editbox)
-    editbox:SetScript('OnEscapePressed', function(self)
-        self:ClearFocus()
-	    do (self.escape or pass)() end
+    editbox:SetScript('OnEscapePressed', function()
+        this:ClearFocus()
+	    do (this.escape or pass)() end
     end)
-    editbox:SetScript('OnEnterPressed', function(self) (self.enter or pass)() end)
-    editbox:SetScript('OnEditFocusGained', function(self)
-	    if self.block_focus then
-		    self.block_focus = false
-		    self:ClearFocus()
+    editbox:SetScript('OnEnterPressed', function() (this.enter or pass)() end)
+    editbox:SetScript('OnEditFocusGained', function()
+	    if this.block_focus then
+		    this.block_focus = false
+		    this:ClearFocus()
 		    return
 	    end
-	    self.overlay:Hide()
-	    self:SetTextColor(rosterfilter.color.text.enabled())
-	    self.focused = true
-	    self:HighlightText()
-	    do (self.focus_gain or pass)() end
+	    this.overlay:Hide()
+	    this:SetTextColor(rosterfilter.color.text.enabled())
+	    this.focused = true
+	    this:HighlightText()
+	    do (this.focus_gain or pass)() end
     end)
-    editbox:SetScript('OnEditFocusLost', function(self)
-	    self.overlay:Show()
-	    self:SetTextColor(0, 0, 0, 0)
-	    self.focused = false
-	    self:HighlightText(0, 0)
-	    self:SetScript('OnUpdate', nil)
-	    do (self.focus_loss or pass)() end
+    editbox:SetScript('OnEditFocusLost', function()
+	    this.overlay:Show()
+	    this:SetTextColor(0, 0, 0, 0)
+	    this.focused = false
+	    this:HighlightText(0, 0)
+	    this:SetScript('OnUpdate', nil)
+	    do (this.focus_loss or pass)() end
     end)
-    editbox:SetScript('OnTextChanged', function(self, is_user_input)
-	    do (self.change or pass)(self, is_user_input) end
-        self.overlay:SetText(self.formatter and self.formatter(self:GetText()) or self:GetText())
+    -- Vanilla's OnTextChanged has no isUserInput distinction; nothing here consumes it
+    -- meaningfully anyway (editbox.change callbacks only ever use the frame itself).
+    editbox:SetScript('OnTextChanged', function()
+	    do (this.change or pass)(this) end
+        this.overlay:SetText(this.formatter and this.formatter(this:GetText()) or this:GetText())
     end)
-    editbox:SetScript('OnChar', function(self) (self.char or pass)() end)
+    editbox:SetScript('OnChar', function() (this.char or pass)() end)
     do
         local last_click = { t = 0 }
-        editbox:SetScript('OnMouseDown', function(self, button)
-	        if button == 'RightButton' then
-		        self:SetText('')
-		        self:ClearFocus()
-		        self.block_focus = true
+        editbox:SetScript('OnMouseDown', function()
+	        if arg1 == 'RightButton' then
+		        this:SetText('')
+		        this:ClearFocus()
+		        this.block_focus = true
 	        else
 	            local x, y = GetCursorPosition()
 	            -- local offset = x - editbox:GetLeft()*editbox:GetEffectiveScale() TODO use a fontstring to measure getstringwidth for structural highlighting
@@ -342,10 +345,10 @@ end
 
 do
 	local function update_bar()
-		if self:GetValue() < 1 then
-			self:SetAlpha(1 - (sin(GetTime() * 180) + 1) / 4)
+		if this:GetValue() < 1 then
+			this:SetAlpha(1 - (sin(GetTime() * 180) + 1) / 4)
 		else
-			self:SetAlpha(1)
+			this:SetAlpha(1)
 		end
 	end
 	function M.status_bar(parent)
@@ -430,9 +433,9 @@ function M.horizontal_line(parent, y_offset, inverted_color)
     texture:SetPoint('TOPRIGHT', parent, 'TOPRIGHT', -2, y_offset)
     texture:SetHeight(2)
     if inverted_color then
-        texture:SetColorTexture(rosterfilter.color.panel.background())
+        texture:SetTexture(rosterfilter.color.panel.background())
     else
-        texture:SetColorTexture(rosterfilter.color.content.background())
+        texture:SetTexture(rosterfilter.color.content.background())
     end
     return texture
 end
@@ -443,9 +446,9 @@ function M.vertical_line(parent, x_offset, top_offset, bottom_offset, inverted_c
     texture:SetPoint('BOTTOMLEFT', parent, 'BOTTOMLEFT', x_offset, bottom_offset or 2)
     texture:SetWidth(2)
     if inverted_color then
-        texture:SetColorTexture(rosterfilter.color.panel.background())
+        texture:SetTexture(rosterfilter.color.panel.background())
     else
-        texture:SetColorTexture(rosterfilter.color.content.background())
+        texture:SetTexture(rosterfilter.color.content.background())
     end
     return texture
 end
@@ -485,7 +488,7 @@ function M.slider(parent)
     set_panel_style(slider)
     local thumb_texture = slider:CreateTexture(nil, 'ARTWORK')
     thumb_texture:SetPoint('CENTER', 0, 0)
-    thumb_texture:SetColorTexture(rosterfilter.color.content.background())
+    thumb_texture:SetTexture(rosterfilter.color.content.background())
     thumb_texture:SetHeight(18)
     thumb_texture:SetWidth(8)
     set_size(thumb_texture, 8, 18)
@@ -518,7 +521,7 @@ function M.checkbox(parent)
     checkbox:SetNormalTexture(nil)
     checkbox:SetPushedTexture(nil)
     checkbox:GetHighlightTexture():SetAllPoints()
-    checkbox:GetHighlightTexture():SetColorTexture(1, 1, 1, .2)
+    checkbox:GetHighlightTexture():SetTexture(1, 1, 1, .2)
     checkbox:GetCheckedTexture():SetTexCoord(.12, .88, .12, .88)
     checkbox:GetHighlightTexture('BLEND')
     return checkbox

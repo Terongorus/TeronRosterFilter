@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter.zones'
+RosterFilterAddonTable 'rosterfilter.zones'
 
 -- a few zones have no UiMapID in 2.4.0
 -- Naxxramas, Magisters' Terrace, Arenas

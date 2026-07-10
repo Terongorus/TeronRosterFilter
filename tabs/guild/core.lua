@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter.tabs.guild'
+RosterFilterAddonTable 'rosterfilter.tabs.guild'
 
 local rosterfilter = require 'rosterfilter'
 
@@ -100,7 +100,8 @@ function tab.OPEN()
     name_label:SetText(format('<%s>', guildName))
     roster_update_listener = rosterfilter.event_listener("GUILD_ROSTER_UPDATE", function() refresh = true; end)
     player_guild_update_listener = rosterfilter.event_listener("PLAYER_GUILD_UPDATE", function() refresh = true; end)
-    motd_listener = rosterfilter.event_listener("GUILD_MOTD", function(self, message) motd_label:SetText(message); end)
+    -- Vanilla's GUILD_MOTD event delivers its text via the global arg1, not a parameter.
+    motd_listener = rosterfilter.event_listener("GUILD_MOTD", function() motd_label:SetText(arg1); end)
 
     if not CanEditMOTD() then
         motd_edit_button:Disable()

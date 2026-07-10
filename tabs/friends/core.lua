@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter.tabs.friends'
+RosterFilterAddonTable 'rosterfilter.tabs.friends'
 
 local rosterfilter = require 'rosterfilter'
 

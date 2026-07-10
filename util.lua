@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter'
+RosterFilterAddonTable 'rosterfilter'
 
 M.immutable = setmetatable({}, {
 	__metatable = false,
@@ -39,16 +39,16 @@ end
 
 function M.set(...)
     local t = {}
-    for i = 1, select('#', ...) do
-        t[select(i, ...)] = true
+    for i = 1, arg.n do
+        t[arg[i]] = true
     end
     return t
 end
 
 function M.iter(...)
     local t = {}
-    for i = 1, select('#', ...) do
-        t[select(i, ...)] = true
+    for i = 1, arg.n do
+        t[arg[i]] = true
     end
     return pairs(t)
 end
@@ -69,7 +69,7 @@ end
 M.join = table.concat
 
 M.index = function(t, ...)
-	for _, v in ipairs{...} do
+	for _, v in ipairs(arg) do
 		t = t and t[v]
 	end
 	return t
@@ -206,10 +206,12 @@ function M.later(t, t0)
 end
 
 function M.signal()
-	local arg
+	-- named "captured", not "arg", since Lua 5.0 auto-creates its own local `arg`
+	-- table inside the inner vararg function below, which would otherwise shadow this
+	local captured
 	return function(...)
-        arg = {...}
+        captured = arg
 	end, function()
-		return arg
+		return captured
 	end
 end

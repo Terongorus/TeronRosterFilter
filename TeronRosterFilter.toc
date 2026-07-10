@@ -1,8 +1,8 @@
 ## Interface: 11200
-## Title: RosterFilter
-## Author: Starhammer
-## Notes: A guild frame replacement.
-## Version: 2.4
+## Title: Teron's Roster Filter
+## Author: Starhammer, Vanilla port by GitHub Copilot & ivanovlk, Teron fork by Terongorus
+## Notes: Guild and Friends roster browser with search/sort filtering and quick actions. Vanilla 1.12.1 compatible.
+## Version: 3.0.0
 ## SavedVariables: RosterFilterOptions
 
 libs\package.lua

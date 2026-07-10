@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter.core.slash'
+RosterFilterAddonTable 'rosterfilter.core.slash'
 
 local rosterfilter = require 'rosterfilter'
 
@@ -9,6 +9,7 @@ end
 
 
 _G.SLASH_ROSTERFILTER1 = '/roster'
+_G.SLASH_ROSTERFILTER2 = '/trf'
 function SlashCmdList.ROSTERFILTER(command)
 	if not command then return end
 	local arguments = rosterfilter.tokenize(command)

@@ -1,4 +1,7 @@
-local _, addon_table = ...
+-- Vanilla's file loader never passes (addonName, addonTable) args to a chunk the way
+-- modern clients do, so the shared addon table lives on a plain global instead.
+_G.RosterFilterAddonTable = _G.RosterFilterAddonTable or {}
+local addon_table = _G.RosterFilterAddonTable
 
 local _G, setfenv, setmetatable = _G, setfenv, setmetatable
 local environments, interfaces = {}, {}
@@ -45,3 +48,13 @@ end
 -- for testing
 _G.module = create_module
 _G.require = require
+
+-- Vanilla sound-name polyfill (vanilla uses string sound names, not the SOUNDKIT enum
+-- table). Merged key-by-key rather than an all-or-nothing "if not SOUNDKIT" guard,
+-- since another addon (TeronModernSpellBook) polyfills the same global with a
+-- different partial set of keys and may load first, which would otherwise block
+-- these keys from ever being added.
+SOUNDKIT = SOUNDKIT or {}
+if not SOUNDKIT.IG_MAINMENU_OPEN then SOUNDKIT.IG_MAINMENU_OPEN = "igMainMenuOpen" end
+if not SOUNDKIT.IG_MAINMENU_CLOSE then SOUNDKIT.IG_MAINMENU_CLOSE = "igMainMenuClose" end
+if not SOUNDKIT.IG_CHARACTER_INFO_TAB then SOUNDKIT.IG_CHARACTER_INFO_TAB = "igCharacterInfoTab" end

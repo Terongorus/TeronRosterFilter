@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter'
+RosterFilterAddonTable 'rosterfilter'
 
 local rosterfilter = require 'rosterfilter'
 

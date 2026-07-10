@@ -1,4 +1,4 @@
-select(2, ...) 'rosterfilter'
+RosterFilterAddonTable 'rosterfilter'
 
 local event_frame = CreateFrame'Frame'
 
@@ -17,12 +17,15 @@ function handle.LOAD()
         end
     end)
 
-	event_frame:SetScript('OnEvent', function(_, event, ...)
+	-- Vanilla's OnEvent is pre-vararg: event is a global during the callback, not a
+	-- function parameter. A listener that needs an event argument (e.g. arg1) reads
+	-- the vanilla global directly inside its own callback.
+	event_frame:SetScript('OnEvent', function()
         for id, listener in pairs(listeners) do
             if listener.killed then
                 listeners[id] = nil
             elseif event == listener.event then
-                listener.cb(...)
+                listener.cb()
             end
         end
     end)
